@@ -1,0 +1,5 @@
+p, user, resource, read
+p, admin, resource, read
+p, admin, resource, write
+g, alice, admin
+g, bob, user

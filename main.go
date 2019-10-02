@@ -5,7 +5,7 @@ import (
 	"casbin_example/handler"
 	"casbin_example/middleware"
 	"fmt"
-	gormadapter "github.com/casbin/gorm-adapter/v2"
+	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -17,10 +17,7 @@ var (
 
 func init() {
 	// Initialize  casbin adapter
-	adapter, err := gormadapter.NewAdapterByDB(component.DB)
-	if err != nil {
-		panic(fmt.Sprintf("failed to initialize casbin adapter: %v", err))
-	}
+	adapter := fileadapter.NewAdapter("config/basic_policy.csv")
 
 	// Initialize gin router
 	router = gin.Default()
@@ -38,11 +35,15 @@ func init() {
 }
 
 func main() {
-	defer component.DB.Close()
+	defer func() {
+		err := component.DB.Close()
+		if err != nil {
+			log.Println(fmt.Errorf("failed to close DB connection: %w", err))
+		}
+	}()
 
 	err := router.Run(":8081")
 	if err != nil {
-		panic(fmt.Sprintf("failed to start gin engin: %v", err))
+		log.Fatalln(fmt.Errorf("faild to start Gin application: %w", err))
 	}
-	log.Println("application is now running...")
 }

@@ -15,15 +15,16 @@ var (
 
 func init() {
 	// Connect to DB
-	var err error
-	DB, err = gorm.Open("mysql", "your_db_url")
-	if err != nil {
-		panic(fmt.Sprintf("failed to connect to DB: %v", err))
-	}
+	//var err error
+	//DB, err = gorm.Open("mysql", "your_db_url")
+	//if err != nil {
+	//	panic(fmt.Errorf("failed to connect to DB: %w", err))
+	//}
 
 	// Initialize cache
+	var err error
 	GlobalCache, err = bigcache.NewBigCache(bigcache.DefaultConfig(30 * time.Minute))
 	if err != nil {
-		panic(fmt.Sprintf("failed to initialize cahce: %v", err))
+		panic(fmt.Errorf("failed to initialize cahce: %w", err))
 	}
 }

@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"github.com/allegro/bigcache"
 	"github.com/casbin/casbin/v2"
-	gormadapter "github.com/casbin/gorm-adapter/v2"
+	"github.com/casbin/casbin/v2/persist"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 )
 
-// Determine if current subject has logged in.
+// Authenticate determines if current subject has logged in.
 func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Get session id
@@ -28,8 +28,8 @@ func Authenticate() gin.HandlerFunc {
 	}
 }
 
-// Determine if current subject has been authorized to take an action on an object.
-func Authorize(obj string, act string, adapter *gormadapter.Adapter) gin.HandlerFunc {
+// Authorize determines if current subject has been authorized to take an action on an object.
+func Authorize(obj string, act string, adapter persist.Adapter) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		val, existed := c.Get("current_subject")
 		if !existed {
@@ -51,7 +51,7 @@ func Authorize(obj string, act string, adapter *gormadapter.Adapter) gin.Handler
 	}
 }
 
-func enforce(sub string, obj string, act string, adapter *gormadapter.Adapter) (bool, error) {
+func enforce(sub string, obj string, act string, adapter persist.Adapter) (bool, error) {
 	enforcer, err := casbin.NewEnforcer("config/rbac_model.conf", adapter)
 	if err != nil {
 		return false, fmt.Errorf("failed to create casbin enforcer: %w", err)
